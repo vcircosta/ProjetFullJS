@@ -44,3 +44,15 @@ git merge feature/nom-fonctionnalité
 ------- Pousser la branche de destination mise à jour vers le dépôt distant :
 git push origin dev  ou main
 
+INSTALLATION DE DEPENDANCES :
+
+express : 
+
+npm init -y
+npm install express
+
+
+nodemon :
+
+npm install -g nodemon
+
