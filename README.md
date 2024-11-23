@@ -56,3 +56,6 @@ nodemon :
 
 npm install -g nodemon
 
+autres: 
+
+npm install mongoose dotenv cors swagger-jsdoc swagger-ui-express
