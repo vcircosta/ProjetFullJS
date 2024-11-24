@@ -2,7 +2,12 @@ const express = require('express');
 const router = express.Router();
 const cvController = require('../controllers/cvController');
 
-// Routes pour les CV
+// Route publique pour lister tous les CV
+router.get('/public/cvs', cvController.getAllCvs);
+
+router.get('/search', cvController.searchCvs);
+
+// Routes existantes pour gérer les CV
 router.get('/cvs', cvController.getAllCvs);
 router.get('/cvs/:id', cvController.getCvById);
 router.post('/cvs', cvController.createCv);

@@ -26,15 +26,15 @@ const swaggerOptions = {
     apis: ['./src/routes/*.js'],
 };
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 // Test route
 app.get('/', (req, res) => {
     res.send('Hello world');
 });
 
-// Routes
-app.use('/api', apiRouter);
+// Routes directes
+app.use('/', apiRouter);
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {

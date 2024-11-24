@@ -98,3 +98,24 @@ exports.deleteCv = (req, res) => {
     const deletedCv = cvs.splice(cvIndex, 1);
     res.json({ message: 'CV supprimé avec succès.', cv: deletedCv[0] });
 };
+
+// Recherche des CV par nom et prénom
+exports.searchCvs = (req, res) => {
+    const { nom, prenom } = req.query;
+
+    if (!nom && !prenom) {
+        return res.status(400).json({ message: 'Veuillez fournir un nom ou un prénom pour la recherche.' });
+    }
+
+    const results = cvs.filter((cv) => {
+        const matchNom = nom ? cv.nom.toLowerCase().includes(nom.toLowerCase()) : true;
+        const matchPrenom = prenom ? cv.prenom.toLowerCase().includes(prenom.toLowerCase()) : true;
+        return matchNom && matchPrenom;
+    });
+
+    if (results.length === 0) {
+        return res.status(404).json({ message: 'Aucun CV correspondant trouvé.' });
+    }
+
+    res.json(results);
+};
