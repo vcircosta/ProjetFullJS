@@ -113,10 +113,11 @@ exports.searchCvs = async (req, res) => {
   }
 };
 
-// Voir tous les CV
+// Voir tous les CV publics
 exports.getAllCvs = async (req, res) => {
   try {
-    const cvs = await CV.find({ visibility: 'public' }); // Récupère uniquement les CV publics
+    // Filtrer uniquement les CV ayant la visibilité définie sur "public"
+    const cvs = await CV.find({ visibility: 'public' });
     res.json(cvs);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des CV', error });
