@@ -1,3 +1,4 @@
+// app.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -45,9 +46,19 @@ const swaggerOptions = {
       },
     ],
     tags: [
-      { name: 'User', description: 'Gestion des utilisateurs' }, // Tag User d'abord
-      { name: 'CVs', description: 'Gestion des CV' },            // Tag CVs ensuite
-    ],
+      {
+        name: 'User',
+        description: 'Gestion des utilisateurs'
+      },
+      {
+        name: 'CVs',
+        description: 'Gestion des CVs'
+      },
+      {
+        name: 'Recommendations',
+        description: 'Gestion des recommandations'
+      }
+    ]
   },
   apis: ['./src/routes/*.js'], // Assurez-vous que ce chemin est correct
 };
@@ -60,9 +71,14 @@ app.get('/', (req, res) => {
   res.send('Hello world');
 });
 
-// Routes directes
-app.use('/users', userRouter);  // Routes des utilisateurs en premier
-app.use('/cvs', cvRouter);      // Routes des CV après
+// Routes des utilisateurs (avant les autres routes pour qu'elles apparaissent en premier)
+app.use('/register', userRouter); // Route pour l'inscription
+app.use('/login', userRouter);    // Route pour la connexion
+
+// Routes des CV
+app.use('/cvs', cvRouter);        // Routes des CV
+
+// Routes des recommandations (avec authentification)
 app.use('/recommendations', authMiddleware, recommendationRouter); // Routes des recommandations
 
 // Gestion des erreurs

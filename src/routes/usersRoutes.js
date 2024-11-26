@@ -12,7 +12,7 @@ const userController = require('../controllers/userController');
 
 /**
  * @swagger
- * /users/register:
+ * /register:
  *   post:
  *     summary: "Inscription d'un utilisateur"
  *     tags: [User]
@@ -41,7 +41,7 @@ router.post('/register', userController.register);
 
 /**
  * @swagger
- * /users/login:
+ * /login:
  *   post:
  *     summary: "Connexion d'un utilisateur"
  *     tags: [User]
