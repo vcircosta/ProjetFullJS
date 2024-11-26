@@ -3,7 +3,32 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const router = express.Router();
 
-// Inscription
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: "Inscription d'un utilisateur"
+ *     description: "Crée un nouvel utilisateur."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: "Utilisateur créé avec succès"
+ *       500:
+ *         description: "Erreur lors de la création de l'utilisateur"
+ */
 router.post('/register', async (req, res) => {
   console.log("Données reçues :", req.body); // Ajout du log ici
   try {
@@ -16,7 +41,39 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Connexion
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: "Connexion d'un utilisateur"
+ *     description: "Permet à un utilisateur de se connecter."
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: "Connexion réussie"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: "Identifiants incorrects"
+ *       500:
+ *         description: "Erreur lors de la connexion"
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
