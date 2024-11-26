@@ -40,6 +40,10 @@ app.get('/', (req, res) => {
   res.send('Hello world');
 });
 
+// src/app.js
+const cvRouter = require('./routes/cvRoutes');
+app.use('/cvs', cvRouter);
+
 // Routes directes (non protégées)
 app.use('/cvs', apiRouter);
 

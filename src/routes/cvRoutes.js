@@ -1,17 +1,18 @@
 const express = require('express');
+const { createCV, updateCV, deleteCV, getCVs } = require('../controllers/cvController');
+const authMiddleware = require('../middleware/auth');
 const router = express.Router();
-const cvController = require('../controllers/cvController');
 
-// Route publique pour lister tous les CV
-router.get('/public/cvs', cvController.getAllCvs);
+// Route pour créer un CV (protection avec JWT)
+router.post('/', authMiddleware, createCV);
 
-router.get('/search', cvController.searchCvs);
+// Route pour mettre à jour un CV (protection avec JWT)
+router.put('/:cvId', authMiddleware, updateCV);
 
-// Routes existantes pour gérer les CV
-router.get('/cvs', cvController.getAllCvs);
-router.get('/cvs/:id', cvController.getCvById);
-router.post('/cvs', cvController.createCv);
-router.put('/cvs/:id', cvController.updateCv);
-router.delete('/cvs/:id', cvController.deleteCv);
+// Route pour supprimer un CV (protection avec JWT)
+router.delete('/:cvId', authMiddleware, deleteCV);
+
+// Route pour obtenir tous les CV (publique)
+router.get('/', getCVs);
 
 module.exports = router;
