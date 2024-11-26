@@ -45,7 +45,7 @@ app.use('/cvs', apiRouter);
 
 // Routes protégées par authentification
 app.use('/users', require('./routes/usersRoutes'));
-app.use('/recommendations', authMiddleware, require('./routes/recommandationRoutes'));
+app.use('/recommendations', authMiddleware, require('./routes/recommendationRoutes'));
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
