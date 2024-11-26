@@ -55,23 +55,50 @@ exports.getMyCv = async (req, res) => {
   }
 };
 
-// Mettre à jour un CV
+// Mettre à jour un CV avec remplacement des champs vides par les données existantes
 exports.updateCV = async (req, res) => {
   try {
-    const updates = req.body;
-    const cv = await CV.findOneAndUpdate(
-      { userId: req.user.userId },
-      updates,
-      { new: true } // Retourne le CV mis à jour
-    );
-    if (!cv) {
-      return res.status(404).json({ message: 'CV non trouvé' });
+    // Récupérer le CV existant pour l'utilisateur connecté
+    const existingCv = await CV.findOne({ userId: req.user.userId });
+    if (!existingCv) {
+      return res.status(404).json({
+        message: 'CV non trouvé. Vous devez d\'abord créer un CV avant de le mettre à jour.',
+      });
     }
-    res.json({ message: 'CV mis à jour avec succès', cv });
+
+    // Récupérer les données envoyées par le client
+    const updates = req.body;
+
+    // Fusionner les données existantes avec celles envoyées par le client
+    const updatedData = {
+      title: updates.title || existingCv.title, // Conserver le titre existant si non fourni
+      description: updates.description || existingCv.description, // Conserver la description existante
+      experiencesPedagogiques: updates.experiencesPedagogiques?.length
+        ? updates.experiencesPedagogiques
+        : existingCv.experiencesPedagogiques, // Conserver les expériences pédagogiques si non fournies
+      experiencesProfessionnelles: updates.experiencesProfessionnelles?.length
+        ? updates.experiencesProfessionnelles
+        : existingCv.experiencesProfessionnelles, // Conserver les expériences professionnelles si non fournies
+      visibility: updates.visibility || existingCv.visibility, // Conserver la visibilité existante
+    };
+
+    // Mettre à jour le CV dans la base de données
+    const updatedCv = await CV.findOneAndUpdate(
+      { userId: req.user.userId },
+      { $set: updatedData },
+      { new: true, runValidators: true } // Retourner le CV mis à jour et valider les données
+    );
+
+    // Retourner le CV mis à jour
+    res.json({
+      message: 'CV mis à jour avec succès.',
+      cv: updatedCv,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la mise à jour du CV', error });
+    res.status(500).json({ message: 'Erreur lors de la mise à jour du CV.', error });
   }
 };
+
 
 // Supprimer un CV
 exports.deleteCV = async (req, res) => {
