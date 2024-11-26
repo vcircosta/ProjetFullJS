@@ -44,6 +44,10 @@ const swaggerOptions = {
         BearerAuth: [],
       },
     ],
+    tags: [
+      { name: 'User', description: 'Gestion des utilisateurs' }, // Tag User d'abord
+      { name: 'CVs', description: 'Gestion des CV' },            // Tag CVs ensuite
+    ],
   },
   apis: ['./src/routes/*.js'], // Assurez-vous que ce chemin est correct
 };
@@ -57,9 +61,9 @@ app.get('/', (req, res) => {
 });
 
 // Routes directes
-app.use('/cvs', cvRouter);
-app.use('/users', userRouter);
-app.use('/recommendations', authMiddleware, recommendationRouter);
+app.use('/users', userRouter);  // Routes des utilisateurs en premier
+app.use('/cvs', cvRouter);      // Routes des CV après
+app.use('/recommendations', authMiddleware, recommendationRouter); // Routes des recommandations
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
