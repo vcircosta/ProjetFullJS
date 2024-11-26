@@ -5,7 +5,9 @@ const cors = require('cors');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const connectDB = require('./database'); // Connexion à la base de données
-const apiRouter = require('./routes/cvRoutes');
+const cvRouter = require('./routes/cvRoutes'); // Routes des CV
+const userRouter = require('./routes/usersRoutes'); // Routes des utilisateurs
+const recommendationRouter = require('./routes/recommendationRoutes'); // Routes des recommandations
 const authMiddleware = require('./middleware/auth'); // Middleware d'authentification
 
 const app = express();
@@ -14,7 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connexion à MongoDB (utilisez la fonction importée depuis le fichier database.js)
+// Connexion à MongoDB
 connectDB();
 
 // Swagger Documentation
@@ -24,12 +26,26 @@ const swaggerOptions = {
     info: {
       title: 'CV API',
       version: '1.0.0',
+      description: 'API pour la gestion des CV et des utilisateurs',
     },
     servers: [
       { url: process.env.SERVER_URL || 'http://localhost:3000/' },
     ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+        },
+      },
+    },
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
-  apis: ['./src/routes/*.js'],
+  apis: ['./src/routes/*.js'], // Assurez-vous que ce chemin est correct
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -40,16 +56,10 @@ app.get('/', (req, res) => {
   res.send('Hello world');
 });
 
-// src/app.js
-const cvRouter = require('./routes/cvRoutes');
+// Routes directes
 app.use('/cvs', cvRouter);
-
-// Routes directes (non protégées)
-app.use('/cvs', apiRouter);
-
-// Routes protégées par authentification
-app.use('/users', require('./routes/usersRoutes'));
-app.use('/recommendations', authMiddleware, require('./routes/recommendationRoutes'));
+app.use('/users', userRouter);
+app.use('/recommendations', authMiddleware, recommendationRouter);
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
