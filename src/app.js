@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // Charger les variables d'environnement depuis un fichier .env
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -11,16 +11,19 @@ const cvRouter = require('./routes/cvRoutes'); // Routes des CV
 const recommendationRouter = require('./routes/recommendationRoutes'); // Routes des recommandations
 const authMiddleware = require('./middleware/auth'); // Middleware d'authentification
 
+// Initialiser l'application Express
 const app = express();
 
-// Middleware
+// Middleware pour gérer les requêtes CORS
 app.use(cors());
+
+// Middleware pour parser le corps des requêtes JSON
 app.use(express.json());
 
-// Connexion à MongoDB
+// Connexion à la base de données MongoDB via Mongoose
 connectDB();
 
-// Swagger Documentation
+// Configuration de la documentation Swagger
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',
@@ -30,7 +33,7 @@ const swaggerOptions = {
       description: 'API pour la gestion des CV, des utilisateurs et des recommandations',
     },
     servers: [
-      { url: process.env.SERVER_URL || 'http://localhost:3000/' },
+      { url: process.env.SERVER_URL || 'http://localhost:5000/' },
     ],
     components: {
       securitySchemes: {
@@ -55,10 +58,11 @@ const swaggerOptions = {
   apis: ['./src/routes/*.js'], // Assurez-vous que ce chemin est correct
 };
 
+// Initialisation de Swagger
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-// Test route
+// Route de test pour vérifier si le serveur fonctionne
 app.get('/', (req, res) => {
   res.send('Hello world');
 });
@@ -66,13 +70,13 @@ app.get('/', (req, res) => {
 // Routes pour l'authentification
 app.use('/auth', authRouter);
 
-// Routes des utilisateurs et profils
+// Routes pour gérer les utilisateurs et profils
 app.use('/users', userRouter);
 
-// Routes des CVs
+// Routes pour gérer les CVs
 app.use('/cvs', cvRouter);
 
-// Routes des recommandations (avec authentification)
+// Routes pour gérer les recommandations (avec authentification requise)
 app.use('/recommendations', authMiddleware, recommendationRouter);
 
 app.get('/api/healthcheck', (req, res) => {
@@ -85,9 +89,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Une erreur interne est survenue.' });
 });
 
-// Gestion des routes non définies
+// Gestion des routes non définies (404)
 app.use((req, res) => {
   res.status(404).send("Désolé, cette route n'existe pas");
+});
+
+// Démarrage du serveur sur le port 5000
+app.listen(5000, () => {
+  console.log("Server is running on http://localhost:5000");
 });
 
 module.exports = app;
