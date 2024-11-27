@@ -141,4 +141,55 @@ router.post('/login', authController.login);
  */
 router.post('/logout', authController.logout);
 
+/**
+ * @swagger
+ * /auth/test-password:
+ *   post:
+ *     summary: Test de la méthode comparePassword
+ *     tags: [Auth]
+ *     description: Teste la comparaison de mot de passe en fournissant un email et un mot de passe.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: toto@toto.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Mot de passe correct
+ *       401:
+ *         description: Mot de passe incorrect
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+router.post('/test-password', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await require('../models/user').findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (isMatch) {
+      return res.status(200).json({ message: 'Mot de passe correct' });
+    } else {
+      return res.status(401).json({ message: 'Mot de passe incorrect' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Erreur lors de la vérification', error });
+  }
+});
+
 module.exports = router;

@@ -153,3 +153,16 @@ exports.getAllCvs = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la récupération des CV', error });
   }
 };
+
+// Récupérer les détails d'un CV par ID
+exports.getCvById = async (req, res) => {
+  try {
+    const cv = await CV.findById(req.params.id);
+    if (!cv) {
+      return res.status(404).json({ message: 'CV introuvable.' });
+    }
+    res.json(cv);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération du CV.', error });
+  }
+};

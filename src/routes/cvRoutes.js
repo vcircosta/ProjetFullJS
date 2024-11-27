@@ -61,6 +61,31 @@ router.get('/search', cvController.searchCvs);
 
 /**
  * @swagger
+ * /cvs/{id}:
+ *   get:
+ *     summary: Récupérer les détails d'un CV par ID
+ *     tags: [CVs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du CV
+ *     responses:
+ *       200:
+ *         description: CV trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       404:
+ *         description: CV introuvable
+ */
+router.get('/:id', cvController.getCvById);
+
+/**
+ * @swagger
  * /cvs/mycv:
  *   get:
  *     summary: Récupérer le CV de l'utilisateur connecté
