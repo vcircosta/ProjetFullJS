@@ -61,26 +61,6 @@ router.get('/search', cvController.searchCvs);
 
 /**
  * @swagger
- * /cvs/profile:
- *   get:
- *     summary: Récupérer le profil de l'utilisateur connecté
- *     tags: [CVs]
- *     security:
- *       - BearerAuth: []
- *     responses:
- *       200:
- *         description: Profil utilisateur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       401:
- *         description: Non autorisé
- */
-router.get('/profile', authMiddleware, cvController.getMyProfile);
-
-/**
- * @swagger
  * /cvs/mycv:
  *   get:
  *     summary: Récupérer le CV de l'utilisateur connecté

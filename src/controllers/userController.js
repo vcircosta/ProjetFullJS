@@ -1,48 +1,41 @@
 const User = require('../models/user');
-const jwt = require('jsonwebtoken');
 
-// Inscription d'un utilisateur
-exports.register = async (req, res) => {
+// Récupérer le profil de l'utilisateur connecté
+exports.getUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    
-    // Vérifier que les champs sont présents
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Tous les champs sont requis.' });
+    const user = await User.findById(req.user.userId).select('-password'); // Exclure le mot de passe
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
     }
-
-    // Créer un nouvel utilisateur
-    const user = new User({ username, email, password });
-    await user.save();
-
-    return res.status(201).json({ message: 'Utilisateur créé avec succès' });
+    res.status(200).json({ success: true, data: user });
   } catch (error) {
-    return res.status(500).json({ message: 'Erreur lors de la création de l’utilisateur', error });
+    console.error('Erreur lors de la récupération du profil :', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur lors de la récupération du profil', error: error.message });
   }
 };
 
-// Connexion d'un utilisateur
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-
+// Mettre à jour le profil de l'utilisateur
+exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    
+    const updates = req.body;
+
+    // Vérification des mises à jour vides
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ success: false, message: 'Aucune donnée à mettre à jour' });
+    }
+
+    const user = await User.findByIdAndUpdate(req.user.userId, updates, { 
+      new: true, 
+      runValidators: true 
+    });
+
     if (!user) {
-      return res.status(401).json({ message: 'Identifiants incorrects' });
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé pour mise à jour' });
     }
 
-    const isMatch = await user.comparePassword(password);
-    
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Identifiants incorrects' });
-    }
-
-    // Générer un token JWT
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
-    res.status(200).json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Erreur lors de la connexion', error: err });
+    res.status(200).json({ success: true, message: 'Profil mis à jour avec succès', data: user });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du profil :', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur lors de la mise à jour du profil', error: error.message });
   }
 };

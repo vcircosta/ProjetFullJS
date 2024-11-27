@@ -1,4 +1,3 @@
-// app.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -6,8 +5,9 @@ const cors = require('cors');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 const connectDB = require('./database'); // Connexion à la base de données
+const authRouter = require('./routes/authRoutes'); // Routes d'authentification
+const userRouter = require('./routes/userRoutes'); // Routes des utilisateurs et profils
 const cvRouter = require('./routes/cvRoutes'); // Routes des CV
-const userRouter = require('./routes/usersRoutes'); // Routes des utilisateurs
 const recommendationRouter = require('./routes/recommendationRoutes'); // Routes des recommandations
 const authMiddleware = require('./middleware/auth'); // Middleware d'authentification
 
@@ -27,7 +27,7 @@ const swaggerOptions = {
     info: {
       title: 'CV API',
       version: '1.0.0',
-      description: 'API pour la gestion des CV et des utilisateurs',
+      description: 'API pour la gestion des CV, des utilisateurs et des recommandations',
     },
     servers: [
       { url: process.env.SERVER_URL || 'http://localhost:3000/' },
@@ -46,19 +46,11 @@ const swaggerOptions = {
       },
     ],
     tags: [
-      {
-        name: 'User',
-        description: 'Gestion des utilisateurs'
-      },
-      {
-        name: 'CVs',
-        description: 'Gestion des CVs'
-      },
-      {
-        name: 'Recommendations',
-        description: 'Gestion des recommandations'
-      }
-    ]
+      { name: 'Auth', description: 'Authentification' },
+      { name: 'User', description: 'Gestion des profils utilisateurs' },
+      { name: 'CVs', description: 'Gestion des CVs' },
+      { name: 'Recommendations', description: 'Gestion des recommandations' },
+    ],
   },
   apis: ['./src/routes/*.js'], // Assurez-vous que ce chemin est correct
 };
@@ -71,15 +63,17 @@ app.get('/', (req, res) => {
   res.send('Hello world');
 });
 
-// Routes des utilisateurs (avant les autres routes pour qu'elles apparaissent en premier)
-app.use('/', userRouter); // Route pour l'inscription
-app.use('/', userRouter);    // Route pour la connexion
+// Routes pour l'authentification
+app.use('/auth', authRouter);
 
-// Routes des CV
-app.use('/cvs', cvRouter);        // Routes des CV
+// Routes des utilisateurs et profils
+app.use('/users', userRouter);
+
+// Routes des CVs
+app.use('/cvs', cvRouter);
 
 // Routes des recommandations (avec authentification)
-app.use('/recommendations', authMiddleware, recommendationRouter); // Routes des recommandations
+app.use('/recommendations', authMiddleware, recommendationRouter);
 
 // Gestion des erreurs
 app.use((err, req, res, next) => {
