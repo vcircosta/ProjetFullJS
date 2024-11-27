@@ -1,7 +1,5 @@
 # ProjetFullJS
 
-
-
 1. Création d'une Branche
 
 ------- Se déplacer vers la branche principale (main) :

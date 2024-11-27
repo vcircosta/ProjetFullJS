@@ -75,6 +75,10 @@ app.use('/cvs', cvRouter);
 // Routes des recommandations (avec authentification)
 app.use('/recommendations', authMiddleware, recommendationRouter);
 
+app.get('/api/healthcheck', (req, res) => {
+  res.json({ message: 'Backend is connected!' });
+});
+
 // Gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
