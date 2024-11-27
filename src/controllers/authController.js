@@ -5,13 +5,10 @@ const jwt = require('jsonwebtoken');
 exports.register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
-    // Vérifier que les champs sont présents
     if (!username || !email || !password) {
       return res.status(400).json({ message: 'Tous les champs sont requis.' });
     }
 
-    // Créer un nouvel utilisateur
     const user = new User({ username, email, password });
     await user.save();
 
@@ -27,22 +24,19 @@ exports.login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email });
-    
-    if (!user) {
+    if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Identifiants incorrects' });
     }
 
-    const isMatch = await user.comparePassword(password);
-    
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Identifiants incorrects' });
-    }
-
-    // Générer un token JWT
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    
     res.status(200).json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la connexion', error: err });
   }
+};
+
+// Déconnexion (si tu gères les tokens côté serveur)
+exports.logout = (req, res) => {
+  // Ici, tu pourrais invalider le token côté serveur (si stocké) ou donner des instructions côté client.
+  res.status(200).json({ message: 'Déconnexion réussie' });
 };

@@ -72,8 +72,8 @@ app.get('/', (req, res) => {
 });
 
 // Routes des utilisateurs (avant les autres routes pour qu'elles apparaissent en premier)
-app.use('/register', userRouter); // Route pour l'inscription
-app.use('/login', userRouter);    // Route pour la connexion
+app.use('/', userRouter); // Route pour l'inscription
+app.use('/', userRouter);    // Route pour la connexion
 
 // Routes des CV
 app.use('/cvs', cvRouter);        // Routes des CV
