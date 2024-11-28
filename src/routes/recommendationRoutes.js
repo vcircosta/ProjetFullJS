@@ -9,6 +9,39 @@ const recommendationsController = require('../controllers/recommendationControll
  *   description: Gestion des recommandations
  */
 
+/**
+ * @swagger
+ * /recommendations:
+ *   get:
+ *     summary: Récupérer toutes les recommandations
+ *     tags: [Recommendations]
+ *     responses:
+ *       200:
+ *         description: Liste de toutes les recommandations.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: ID unique de la recommandation.
+ *                     example: "648d23a5f7c8e6d123456789"
+ *                   text:
+ *                     type: string
+ *                     description: Contenu de la recommandation.
+ *                     example: "Great teamwork skills!"
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: Date de création de la recommandation.
+ *                     example: "2024-11-28T10:15:30.000Z"
+ *       500:
+ *         description: Erreur interne du serveur.
+ */
+router.get('/', recommendationsController.getAllRecommendations);
 
 /**
  * @swagger

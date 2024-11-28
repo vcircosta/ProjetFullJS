@@ -1,5 +1,15 @@
 const Recommendation = require('../models/recommendation');
 
+exports.getAllRecommendations = async (req, res) => {
+  try {
+    const recommendations = await Recommendation.find();
+    res.status(200).json(recommendations);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des recommandations :', error);
+    res.status(500).json({ message: 'Erreur interne du serveur' });
+  }
+};
+
 exports.createRecommendation = (req, res) => {
   const { cv, fromUser, text } = req.body;
 
