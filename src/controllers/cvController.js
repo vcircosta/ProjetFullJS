@@ -158,11 +158,14 @@ exports.getAllCvs = async (req, res) => {
 exports.getCvById = async (req, res) => {
   try {
     const cv = await CV.findById(req.params.id);
-    if (!cv) {
-      return res.status(404).json({ message: 'CV introuvable.' });
+
+    if (!cv || cv.visibility === 'private') {
+      return res.status(404).json({ message: 'CV introuvable ou non accessible.' });
     }
+
     res.json(cv);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération du CV.', error });
   }
 };
+

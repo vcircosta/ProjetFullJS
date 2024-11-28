@@ -82,7 +82,7 @@ router.get('/search', cvController.searchCvs);
  *       404:
  *         description: CV introuvable
  */
-router.get('/:id', cvController.getCvById);
+router.get('/:id', authMiddleware, cvController.getCvById);
 
 /**
  * @swagger
