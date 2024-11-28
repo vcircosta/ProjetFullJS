@@ -1,40 +1,22 @@
 const CV = require('../models/cv'); // Modèle CV
-const User = require('../models/user'); // Modèle utilisateur si nécessaire
+const User = require('../models/user'); // Si nécessaire pour les utilisateurs
 
-// Voir mon profil
-exports.getMyProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId); // Assurez-vous que l'authMiddleware ajoute req.user
-    if (!user) {
-      return res.status(404).json({ message: 'Profil non trouvé.' });
-    }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération du profil', error });
-  }
-};
+
 
 // Créer un CV
 exports.createCV = async (req, res) => {
   try {
-    const {
-      nom,
-      prenom,
-      description,
-      experiencesPedagogiques,
-      experiencesProfessionnelles,
-      visibility,
-    } = req.body;
+    const { title, nom, prenom, description, experiencesPedagogiques, experiencesProfessionnelles, visibility } =
+      req.body;
 
-    // Vérifier si un CV existe déjà pour cet utilisateur
     const existingCv = await CV.findOne({ userId: req.user.userId });
     if (existingCv) {
       return res.status(400).json({ message: 'Un CV existe déjà pour cet utilisateur.' });
     }
 
-    // Créer un nouveau CV
     const cv = new CV({
-      userId: req.user.userId,
+      userId: req.user.userId, // Assurez-vous que l'authMiddleware ajoute req.user
+      title,
       nom,
       prenom,
       description,
@@ -42,7 +24,6 @@ exports.createCV = async (req, res) => {
       experiencesProfessionnelles,
       visibility,
     });
-
     await cv.save();
     res.status(201).json({ message: 'CV créé avec succès', cv });
   } catch (error) {
@@ -63,9 +44,10 @@ exports.getMyCv = async (req, res) => {
   }
 };
 
-// Mettre à jour un CV
+// Mettre à jour un CV avec remplacement des champs vides par les données existantes
 exports.updateCV = async (req, res) => {
   try {
+    // Récupérer le CV existant pour l'utilisateur connecté
     const existingCv = await CV.findOne({ userId: req.user.userId });
     if (!existingCv) {
       return res.status(404).json({
@@ -73,28 +55,32 @@ exports.updateCV = async (req, res) => {
       });
     }
 
+    // Récupérer les données envoyées par le client
     const updates = req.body;
 
     // Fusionner les données existantes avec celles envoyées par le client
     const updatedData = {
-      nom: updates.nom || existingCv.nom,
+      nom: updates.nom || existingCv.nom, // Conserver le nom existant si non fourni
       prenom: updates.prenom || existingCv.prenom,
-      description: updates.description || existingCv.description,
+      title: updates.title || existingCv.title, // Conserver le titre existant si non fourni
+      description: updates.description || existingCv.description, // Conserver la description existante
       experiencesPedagogiques: updates.experiencesPedagogiques?.length
         ? updates.experiencesPedagogiques
-        : existingCv.experiencesPedagogiques,
+        : existingCv.experiencesPedagogiques, // Conserver les expériences pédagogiques si non fournies
       experiencesProfessionnelles: updates.experiencesProfessionnelles?.length
         ? updates.experiencesProfessionnelles
-        : existingCv.experiencesProfessionnelles,
-      visibility: updates.visibility || existingCv.visibility,
+        : existingCv.experiencesProfessionnelles, // Conserver les expériences professionnelles si non fournies
+      visibility: updates.visibility || existingCv.visibility, // Conserver la visibilité existante
     };
 
+    // Mettre à jour le CV dans la base de données
     const updatedCv = await CV.findOneAndUpdate(
       { userId: req.user.userId },
       { $set: updatedData },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true } // Retourner le CV mis à jour et valider les données
     );
 
+    // Retourner le CV mis à jour
     res.json({
       message: 'CV mis à jour avec succès.',
       cv: updatedCv,
@@ -103,6 +89,7 @@ exports.updateCV = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la mise à jour du CV.', error });
   }
 };
+
 
 // Supprimer un CV
 exports.deleteCV = async (req, res) => {
@@ -147,13 +134,13 @@ exports.searchCvs = async (req, res) => {
 // Voir tous les CV publics
 exports.getAllCvs = async (req, res) => {
   try {
+    // Filtrer uniquement les CV ayant la visibilité définie sur "public"
     const cvs = await CV.find({ visibility: 'public' });
     res.json(cvs);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération des CV', error });
   }
 };
-
 // Récupérer les détails d'un CV par ID
 exports.getCvById = async (req, res) => {
   try {
@@ -163,9 +150,8 @@ exports.getCvById = async (req, res) => {
       return res.status(404).json({ message: 'CV introuvable ou non accessible.' });
     }
 
-    res.json(cv);
+    res.status(200).json(cv);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la récupération du CV.', error });
   }
 };
-

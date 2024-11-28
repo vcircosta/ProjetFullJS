@@ -60,29 +60,6 @@ router.get('/public', cvController.getAllCvs);
 router.get('/search', cvController.searchCvs);
 
 /**
- * @swagger
- * /cvs/{id}:
- *   get:
- *     summary: Récupérer les détails d'un CV par ID
- *     tags: [CVs]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID du CV
- *     responses:
- *       200:
- *         description: CV trouvé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       404:
- *         description: CV introuvable
- */
-router.get('/:id', authMiddleware, cvController.getCvById);
 
 /**
  * @swagger
@@ -121,6 +98,9 @@ router.get('/mycv', authMiddleware, cvController.getMyCv);
  *           schema:
  *             type: object
  *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Titre du CV
  *               nom:
  *                 type: string
  *                 description: Nom de l'utilisateur
@@ -134,27 +114,10 @@ router.get('/mycv', authMiddleware, cvController.getMyCv);
  *                 type: array
  *                 items:
  *                   type: object
- *                   properties:
- *                     type:
- *                       type: string
- *                       description: Type de l'expérience pédagogique (Diplôme, Certification, Formation)
- *                     detail:
- *                       type: string
- *                       description: Détail de l'expérience pédagogique
  *               experiencesProfessionnelles:
  *                 type: array
  *                 items:
  *                   type: object
- *                   properties:
- *                     poste:
- *                       type: string
- *                       description: Poste occupé
- *                     entreprise:
- *                       type: string
- *                       description: Entreprise
- *                     missions:
- *                       type: string
- *                       description: Missions réalisées
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -184,9 +147,7 @@ router.post('/mycv', authMiddleware, cvController.createCV);
  *           schema:
  *             type: object
  *             properties:
- *               nom:
- *                 type: string
- *               prenom:
+ *               title:
  *                 type: string
  *               description:
  *                 type: string
@@ -194,24 +155,10 @@ router.post('/mycv', authMiddleware, cvController.createCV);
  *                 type: array
  *                 items:
  *                   type: object
- *                   properties:
- *                     type:
- *                       type: string
- *                       description: Type de l'expérience pédagogique (Diplôme, Certification, Formation)
- *                     detail:
- *                       type: string
- *                       description: Détail de l'expérience pédagogique
  *               experiencesProfessionnelles:
  *                 type: array
  *                 items:
  *                   type: object
- *                   properties:
- *                     poste:
- *                       type: string
- *                     entreprise:
- *                       type: string
- *                     missions:
- *                       type: string
  *               visibility:
  *                 type: string
  *                 enum: [public, private]
@@ -242,5 +189,53 @@ router.put('/mycv', authMiddleware, cvController.updateCV);
  *         description: Non autorisé
  */
 router.delete('/mycv', authMiddleware, cvController.deleteCV);
+
+/**
+ * @swagger
+ * /cvs/{id}:
+ *   get:
+ *     summary: Récupérer un CV par son ID
+ *     tags: [CVs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du CV à récupérer
+ *     responses:
+ *       200:
+ *         description: CV trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 nom:
+ *                   type: string
+ *                 prenom:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 visibility:
+ *                   type: string
+ *                   enum: [public, private]
+ *                 experiencesPedagogiques:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 experiencesProfessionnelles:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       404:
+ *         description: CV introuvable
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/:id', cvController.getCvById);
+
 
 module.exports = router;
